@@ -1,2 +1,2 @@
 # sportsorca
-Upcoming soccer matches web application for SportsOrca internship task
+Upcoming Soccer Matches Web Application For SportsOrca Internship Task
