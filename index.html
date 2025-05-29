@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportsOrca - Upcoming Soccer Matches</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .content-wrapper {
+            flex: 1;
+        }
+        
+        .app-header {
+            background: linear-gradient(135deg, #0a2463 0%, #3e92cc 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .app-header h1 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .app-footer {
+            background-color: #343a40;
+            color: #f8f9fa;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .app-footer a {
+            color: #8ecae6;
+            text-decoration: none;
+        }
+        
+        .app-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .match-table {
+            margin-bottom: 0;
+            width: 100%;
+            table-layout: fixed;
+        }
+        
+        .match-table th, .match-table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 12px 8px;
+        }
+        
+        .match-table th {
+            background-color: #f0f4f8;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .team-cell {
+            min-width: 200px;
+        }
+        
+        .team-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .team-logo {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+        
+        .vs-cell {
+            text-align: center;
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
+        .date-time {
+            white-space: nowrap;
+            min-width: 180px;
+        }
+        
+        /* Animation for new data */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .match-row {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        /* Improved table styling */
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .team-cell {
+                min-width: auto;
+            }
+            
+            .date-time {
+                min-width: auto;
+            }
+            
+            .league-button {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .league-logo {
+                width: 40px;
+                height: 40px;
+            }
+        }
+        
+        .team-logo {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            transition: transform 0.2s ease;
+        }
+        
+        .team-info:hover .team-logo {
+            transform: scale(1.2);
+        }
+        
+        /* Refresh button animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .refreshing {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* League selector styling */
+        .league-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        
+        .league-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .league-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .league-button.active {
+            border-color: #0d6efd;
+            background-color: #f0f7ff;
+        }
+        
+        .league-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .league-logo img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .league-name {
+            font-size: 0.8rem;
+            text-align: center;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        /* Score styling */
+        .score {
+            font-weight: bold;
+            background-color: #f8f9fa;
+            padding: 6px 12px;
+            border-radius: 6px;
+            min-width: 70px;
+            text-align: center;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin: 0 auto;
+        }
+        
+        .winner {
+            font-weight: bold;
+            color: #198754;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .team-cell {
+                min-width: auto;
+            }
+            
+            .date-time {
+                min-width: auto;
+            }
+            
+            .league-button {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .league-logo {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="App">
+        <div class="content-wrapper">
+        <header class="app-header">
+            <div class="container">
+                <h1>SportsOrca - Upcoming Soccer Matches</h1>
+                <p class="lead">View upcoming matches for your favorite soccer leagues</p>
+            </div>
+        </header>
+
+        <div class="container mt-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Select League</label>
+                                <div id="league-buttons" class="league-selector">
+                                    <!-- League buttons will be populated by JavaScript -->
+                                    <div class="text-center p-2">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span class="visually-hidden">Loading leagues...</span>
+                                        </div>
+                                        <span class="ms-2">Loading leagues...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="seasonSelect" class="form-label">Select Season</label>
+                                <select class="form-select" id="seasonSelect">
+                                    <option value="2024-2025">2024-2025</option>
+                                    <option value="2023-2024">2023-2024</option>
+                                    <option value="2022-2023">2022-2023</option>
+                                    <option value="2021-2022">2021-2022</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loading" class="text-center my-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Loading matches...</p>
+            </div>
+
+            <div id="error-message" class="alert alert-danger" style="display: none;">
+                Error fetching matches. Please try again later.
+            </div>
+
+            <div id="no-matches" class="alert alert-info" style="display: none;">
+                No upcoming matches found for the selected league and season. The season may have ended. Try selecting a different league or season.
+            </div>
+
+            <!-- Recent Matches Section -->
+            <div id="recent-matches-container" class="card shadow-sm mt-4" style="display: none;">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Matches</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover match-table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Home Team</th>
+                                    <th>Score</th>
+                                    <th>Away Team</th>
+                                    <th>Venue</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-matches-table-body">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="matches-container" class="card shadow-sm" style="display: none;">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 me-3">Upcoming Matches</h5>
+                    <button id="refresh-btn" class="btn btn-sm btn-outline-primary" title="Refresh data">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                        </svg>
+                        <span class="ms-1 d-none d-sm-inline">Refresh</span>
+                    </button>
+                </div>
+                <small id="last-updated" class="text-muted">Last updated: Just now</small>
+            </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover match-table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Home Team</th>
+                                    <th></th>
+                                    <th>Away Team</th>
+                                    <th>Venue</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matches-table-body">
+                                <!-- Sample match data - will be populated by JavaScript -->
+                                <tr>
+                                    <td class="date-time">May 30, 2025 - 3:00 PM</td>
+                                    <td class="team-cell">
+                                        <div class="team-info">
+                                            <img src="https://www.thesportsdb.com/images/media/team/badge/a1af2i1557005128.png" alt="Arsenal logo" class="team-logo">
+                                            <span>Arsenal</span>
+                                        </div>
+                                    </td>
+                                    <td class="vs-cell">vs</td>
+                                    <td class="team-cell">
+                                        <div class="team-info">
+                                            <img src="https://www.thesportsdb.com/images/media/team/badge/z7zrdh1574875364.png" alt="Chelsea logo" class="team-logo">
+                                            <span>Chelsea</span>
+                                        </div>
+                                    </td>
+                                    <td>Emirates Stadium</td>
+                                </tr>
+                                <tr>
+                                    <td class="date-time">May 31, 2025 - 5:30 PM</td>
+                                    <td class="team-cell">
+                                        <div class="team-info">
+                                            <img src="https://www.thesportsdb.com/images/media/team/badge/quq0fm1423128270.png" alt="Liverpool logo" class="team-logo">
+                                            <span>Liverpool</span>
+                                        </div>
+                                    </td>
+                                    <td class="vs-cell">vs</td>
+                                    <td class="team-cell">
+                                        <div class="team-info">
+                                            <img src="https://www.thesportsdb.com/images/media/team/badge/vuspuq1424442903.png" alt="Manchester United logo" class="team-logo">
+                                            <span>Manchester United</span>
+                                        </div>
+                                    </td>
+                                    <td>Anfield</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div><!-- End of content-wrapper -->
+        
+        <footer class="app-footer">
+            <div class="container">
+                <p>© 2025 SportsOrca | Created by Pranay J Sathish | Data provided by <a href="https://www.thesportsdb.com/" target="_blank">TheSportsDB</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

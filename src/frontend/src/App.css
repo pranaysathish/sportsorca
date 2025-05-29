@@ -1,0 +1,81 @@
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background: linear-gradient(135deg, #0a2463 0%, #3e92cc 100%);
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.app-header h1 {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.app-footer {
+  background-color: #343a40;
+  color: #f8f9fa;
+  padding: 1.5rem 0;
+  margin-top: auto;
+  text-align: center;
+}
+
+.app-footer a {
+  color: #8ecae6;
+  text-decoration: none;
+}
+
+.app-footer a:hover {
+  text-decoration: underline;
+}
+
+.match-table {
+  margin-bottom: 0;
+}
+
+.match-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.team-cell {
+  min-width: 200px;
+}
+
+.team-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.vs-cell {
+  text-align: center;
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.date-time {
+  white-space: nowrap;
+  min-width: 180px;
+}
+
+@media (max-width: 768px) {
+  .team-cell {
+    min-width: auto;
+  }
+  
+  .date-time {
+    min-width: auto;
+  }
+}
